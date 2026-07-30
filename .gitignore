@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local data, secrets and exported files (do NOT commit)
+.env
+*.db
+*.sqlite
+*.sqlite3
+tradescout_leads.xlsx
+leads_export.xlsx
+
+# OS
+Thumbs.db
+.DS_Store
