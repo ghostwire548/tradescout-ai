@@ -112,6 +112,47 @@ else:
         f"当前 Campaign：**{active_campaign.name}** · 线索数 **{total_leads}** 条"
     )
 
+    # --- Dashboard (scoped to active campaign) ------------------------------
+    if leads:
+        from sqlmodel import select as _sel
+        from src.tradescout.db import get_session as _gs
+
+        lead_ids = [l.id for l in leads]
+        # Batch-fetch analyses (avoid N+1).
+        with _gs(engine) as sess:
+            all_analyses = sess.exec(
+                _sel(models.WebsiteAnalysis).where(
+                    models.WebsiteAnalysis.lead_id.in_(lead_ids)
+                )
+            ).all()
+        analyzed_ids = {
+            a.lead_id for a in all_analyses
+            if a.status == models.AnalysisStatus.DONE
+        }
+        analyzed = sum(1 for lid in lead_ids if lid in analyzed_ids)
+        msg_count = sum(len(crm.get_messages(engine, lid)) for lid in lead_ids)
+
+        avg_score = sum(l.score for l in leads) / len(leads) if leads else 0
+
+        d1, d2, d3, d4 = st.columns(4)
+        d1.metric("总线索", total_leads)
+        d2.metric("已分析", f"{analyzed}/{total_leads}")
+        d3.metric("平均评分", f"{avg_score:.1f}")
+        d4.metric("已保存话术", msg_count)
+
+        # CRM status breakdown
+        status_counts = {s: 0 for s in models.CRMStatus}
+        for l in leads:
+            status_counts[l.crm_status] += 1
+        scols = st.columns(6)
+        for i, (status, count) in enumerate(status_counts.items()):
+            scols[i].metric(
+                status.value.title(), count,
+                delta=None,
+                delta_color="normal",
+            )
+        st.divider()
+
 # --- Bulk actions ----------------------------------------------------------
 st.header(f"Leads（{active_campaign.name if campaigns else '全部'}）")
 bulk1, bulk2 = st.columns(2)
