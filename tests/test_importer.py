@@ -110,7 +110,7 @@ def test_analyze_csv_classifies_new_duplicate_invalid():
         headers = ["Company", "Website", "Phone"]
         rows = [
             ["New Co", "https://newco.example.com", ""],            # new
-            ["Existing Co", "https://nordicwoodcraft.example.com", ""],  # dup by domain
+            ["Dup IKEA", "ikea.com", ""],                           # dup by domain
             ["", "", ""],                                          # invalid (no name)
             ["No Web Co", "", "123456"],                           # dup by name+phone
         ]
@@ -158,7 +158,7 @@ def test_commit_import_inserts_only_new_and_preserves_existing():
         headers = ["Company", "Website", "Phone"]
         rows = [
             ["New Co", "https://newco.example.com", ""],
-            ["Existing Co", "https://nordicwoodcraft.example.com", ""],
+            ["Dup IKEA", "ikea.com", ""],
             ["", "", ""],
             ["No Web Co", "", "123456"],
         ]
@@ -173,7 +173,7 @@ def test_commit_import_inserts_only_new_and_preserves_existing():
 
         # existing data untouched
         names = {lead.company_name for lead in after}
-        assert "Nordic Woodcraft AB" in names   # original mock lead
+        assert "IKEA" in names             # original mock lead
         assert "No Web Co" in names             # original fallback lead
     finally:
         _cleanup(engine, path)
