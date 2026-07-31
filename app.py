@@ -24,7 +24,7 @@ from src.tradescout.export import build_leads_workbook  # noqa: E402
 import pandas as pd  # noqa: E402
 
 st.set_page_config(
-    page_title=f"{settings.app_name} · M1",
+    page_title=settings.app_name,
     page_icon="🛰️",
     layout="wide",
 )
@@ -43,7 +43,8 @@ engine, seeded = bootstrap()
 
 st.title(f"🛰️ {settings.app_name}")
 st.caption(
-    f"Milestone 1 · Mock mode: {settings.mock_mode} · DB: `{settings.database_url}`"
+    f"v{settings.app_version} · DB: `{settings.database_url}`"
+    + (" · LLM 已启用" if settings.llm_api_key else " · 离线模式")
 )
 
 if seeded and "seeded_shown" not in st.session_state:
@@ -63,6 +64,7 @@ campaigns = crm.get_campaigns(engine)
 
 if not campaigns:
     st.warning("No campaigns found. Re-run the app to seed mock data.")
+    st.stop()
 else:
     # Auto-select first campaign if nothing is selected yet.
     if st.session_state.active_campaign_id not in {c.id for c in campaigns}:

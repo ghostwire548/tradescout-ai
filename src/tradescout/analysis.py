@@ -226,7 +226,6 @@ def analyze_website(
     descriptive message so the UI can report it rather than crashing.
     """
     url = lead.website or ""
-    url = lead.website or ""
     try:
         html = fetcher(url)
         result = analyzer(html, lead)

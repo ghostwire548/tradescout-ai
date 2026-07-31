@@ -170,7 +170,7 @@ def llm_generator(
     result = chat(messages, temperature=0.7, max_tokens=800)
     if result is not None:
         subject = ""
-        if channel == "email" and result.startswith("Subject:"):
+        if channel == "email" and result.lower().startswith("subject:"):
             lines = result.split("\n", 1)
             subject = lines[0].replace("Subject:", "").strip()
             result = lines[1].strip() if len(lines) > 1 else result
